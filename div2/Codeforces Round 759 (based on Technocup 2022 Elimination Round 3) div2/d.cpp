@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <queue>
+#include <set>
 
 using namespace std;
 
@@ -12,32 +13,11 @@ typedef pair<int, int> PII;
 
 const int N = 5e5 + 10;
 
-int arr[N];
-PII a[N];
+int arr[N], p[N];
 
-int q[N], tmp[N];
-long long int ans;
-
-void merge_sort(int q[], int l, int r) {
-    if (l >= r) return;
-    
-    int mid = l + r >> 1;
-    merge_sort(q, l, mid); merge_sort(q, mid + 1, r);
-    
-    int k = 0, i = l, j = mid + 1;
-    while (i <= mid && j <= r) {
-        if (q[i] <= q[j]) tmp[k++] = q[i++];
-        else {
-            ans += mid - i + 1;
-            tmp[k++] = q[j++];
-        }
-    }
-    while (i <= mid) {
-        tmp[k++] = q[i++];
-    }
-    while (j <= r) tmp[k++] = q[j++];
-    
-    for (i = l, j = 0; i <= r; i++, j++) q[i] = tmp[j];
+int find(int x) {
+    if (x == p[x]) return x;
+    return p[x] = find(p[x]);
 }
 
 int main(void) {
@@ -45,32 +25,26 @@ int main(void) {
     scanf("%d", &T);
     while (T -- ) {
         int n;
-        scanf("%d", &n);
-        for (int i = 0; i < n; i++) {
-            scanf("%d", &q[i]);
+        cin >> n;
+        set<int> s;
+        bool flag = false;
+        for (int i = 1; i <= n; i++) {
+            cin >> arr[i];
+            s.insert(arr[i]);
+            p[i] = i;
         }
-        ans = 0;
-        bool flag = false, t = true;
-        for (int i = 0; i < n - 1; i++) {
-            if (q[i] > q[i + 1]) {
-                t = false;
-                break;
+        if (s.size() < n) flag = true;
+        if (!flag) {
+            int cycle = 0;
+            for (int i = 1; i <= n; i++) {
+                int px = find(arr[i]), py = find(i);
+                if (p[px] == p[py]) cycle++;
+                else p[px] = py;
             }
+            flag = (n - cycle) % 2 == 0 ? true : false;
         }
-        if (t) flag = true;
-        for (int i = 0; i < n - 1; i++) {
-            if (q[i] < q[i + 1]) {
-                t = false;
-                break;
-            }
-        }
-        if (t) flag = true;
-        if (flag) printf("YES\n");
-        else {
-            merge_sort(q, 0, n - 1);
-            if (ans & 1) printf("NO\n");
-            else printf("YES\n");
-        }
+        if (flag) cout << "YES" << endl;
+        else cout << "NO" << endl;
     }
 
     return 0;
