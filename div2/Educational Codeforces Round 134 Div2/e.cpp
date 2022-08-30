@@ -14,12 +14,14 @@ const int N = 1e5 + 10;
 
 int main(void) {
     int T;
-    cin >> T;
-    while (T -- ) {
-        int n;
-        cin >> n;
+    // cin >> T;
+    // while (T -- ) {
+    //     int n;
+    //     cin >> n;
 
-    }
+    // }
+    int x = 1;
+    cout << x << " " << ~x << endl;
 
     return 0;
 }
