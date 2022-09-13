@@ -18,13 +18,6 @@ void ask(LL a, LL b) {
     cout << flush;
 }
 
-bool check(LL m) {
-    ask(1, m);
-    LL x;
-    cin >> x;
-    return x == -1 ? false : true;
-}
-
 int main(void) {
     unordered_map<LL, int> cnt;
     LL ans = 0, times = -1;
@@ -33,16 +26,12 @@ int main(void) {
         LL x, y;
         cin >> x;
         ask(i, 1);
-        cin >> y;
-        
+        cin >> y;      
         if (x == -1) {
             ans = i - 1;
             break;
         }
-        if (x != y) {
-            cnt[x]++;
-            cnt[y]++;
-        }
+        if (x != y) cnt[x + y]++;
     }
     if (ans == 0) {
         for (auto [k, v] : cnt) {
