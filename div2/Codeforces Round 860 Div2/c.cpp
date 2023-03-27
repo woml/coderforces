@@ -20,7 +20,7 @@ LL gcd(LL a, LL b) {
 
 int main(void) {
     std::ios::sync_with_stdio(false);
-    std::cin.tie(0);
+    std::cin.tie(nullptr);
     int T;
     cin >> T;
     while (T -- ) {

@@ -13,6 +13,8 @@ typedef pair<int, int> PII;
 const int N = 1e5 + 10;
 
 int main(void) {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
     int T;
     cin >> T;
     while (T -- ) {
