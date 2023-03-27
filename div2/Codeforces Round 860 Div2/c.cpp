@@ -12,37 +12,31 @@ typedef pair<int, int> PII;
 
 const int N = 2e5 + 100;
 
-int a[N], b[N], c[N];
+LL a[N], b[N];
 
-int gcd(int a, int b) {
+LL gcd(LL a, LL b) {
     return b ? gcd(b, a % b) : a;
 }
 
 int main(void) {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0);
     int T;
     cin >> T;
     while (T -- ) {
         int n;
-        scanf("%d", &n);
-        for (int i = 1; i <= n; i++) scanf("%d %d", &a[i], &b[i]);
-        int ans = 1;
-        c[1] = 0;
+        cin >> n;
+        for (int i = 1; i <= n; i++) cin >> a[i] >> b[i];
+        LL ans = 1, pre_gcd = b[1] * a[1], pre_lcm = b[1];
         for (int i = 2; i <= n; i++) {
-            int t = gcd(b[i], b[i - 1]);
-            int d1 = b[i] / t, d2 = b[i - 1] / t;
-            if (c[i - 1]) {
-                int k = c[i - 1] / d1;
-                d2 *= k;
-            }
-            // cout << "i = " << i << " " << d1 << " " << d2 << endl;
-            c[i] = 0;
-            if (a[i - 1] % d1 == 0 && a[i] % d2 == 0) {
-                c[i] = d2;
-                continue;
-            }
+            pre_gcd = gcd(pre_gcd, b[i] * a[i]);
+            pre_lcm = pre_lcm * b[i] / gcd(pre_lcm, b[i]);
+            if (pre_gcd % pre_lcm == 0) continue;
+            pre_gcd = b[i] * a[i];
+            pre_lcm = b[i];
             ans++;
         }
-        printf("%d\n", ans);
+        cout << ans << endl;
     }
 
     return 0;
