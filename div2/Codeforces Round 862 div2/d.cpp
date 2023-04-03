@@ -10,7 +10,7 @@ using namespace std;
 typedef long long LL;
 typedef pair<int, int> PII;
 
-const int N = 1e5 + 10;
+const int N = 2e5 + 10;
 
 int depth[N], h[N], e[N], ne[N], idx;
 int sz[N];
@@ -19,20 +19,11 @@ void add(int a, int b) {
     e[idx] = b; ne[idx] = h[a]; h[a] = idx++;
 }
 
-void bfs(int u) {
-    memset(depth, 0x3f, sizeof depth);
-    queue<int> q;
-    depth[u] = 0;
-    q.push(u);
-    while (q.size()) {
-        auto t = q.front(); q.pop();
-        for (int i = h[t]; ~i; i = ne[i]) {
-            int j = e[i];
-            if (depth[j] > depth[t] + 1) {
-                depth[j] = depth[t] + 1;
-                q.push(j);
-            }
-        }
+void dfs(int u, int father, int depth, std::vector<int> &d) {
+    d[u] = depth;
+    for (int i = h[u]; ~i; i = ne[i]) {
+        int j = e[i];
+        if (j != father) dfs(j, u, depth + 1, d);
     }
 }
 
@@ -43,11 +34,22 @@ void solve() {
     for (int i = 0; i < n - 1; i++) {
         int a, b;
         std::cin >> a >> b;
-        add(a, b); add(b, a);
+        add(a - 1, b - 1); add(b - 1, a - 1);
     }
-    bfs(1);
+    std:vector<int> d1(n), d2(n);
+    dfs(0, -1, 0, d1);
+    int a = std::max_element(d1.begin(), d1.end()) - d1.begin();
+    dfs(a, -1, 0, d1);
+    int b = std::max_element(d1.begin(), d1.end()) - d1.begin();
+    dfs(b, -1, 0, d2);
+    for (int i = 0; i < n; i++) {
+        d1[i] = std::max(d1[i], d2[i]);
+    }
+    std::sort(d1.begin(), d1.end());
+    int ans = 0;
     for (int i = 1; i <= n; i++) {
-
+        while (ans < n && d1[ans] < i) ans++;
+        std::cout << std::min(n, ans + 1) << " ";
     }
     std::cout << "\n";
 }
