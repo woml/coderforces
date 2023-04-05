@@ -10,126 +10,108 @@
  */
 
 #include <iostream>
+#include <cstring>
 #include <set>
 #include <map>
 #include <vector>
 
-using namespace std;
+const int N = 100100, M = N * 2;
 
-const int N = 2e5 + 100;
-vector <pair <int, int>> g[N];
-int val[N];
+std::map<int, int> cnt1, cnt2;
+std::set<int> mad1, mad2;
+std::vector<int> path, path_rank;
 
-vector <int> ans;
-map <int, int> cnt1, cnt2;
-set <int> mad1, mad2;
+int h[N], e[M], ne[M], w[M], idx;
+int v[N];
+bool st[N];
 
-vector <int> path, path_ind;
-bool used[N];
+void add(int a, int b, int c) {
+    e[idx] = b; w[idx] = c; ne[idx] = h[a]; h[a] = idx++;
+}
 
-
-bool dfs(int v, int tar) {
-    used[v] = true;
-    path.push_back(v);
-    if (v == tar) {
-        return true;
-    }
-    for (auto [i, ind] : g[v]) {
-        if (!used[i]) {
-            path_ind.push_back(ind);
-            if (dfs(i, tar)) {
-                return true;
-            }
-            path_ind.pop_back();
+bool dfs(int a, int b) {
+    st[a] = 1;
+    path.push_back(a);
+    if (a == b) return true;
+    for (int i = h[a]; ~i; i = ne[i]) {
+        int j = e[i];
+        if (!st[j]) {
+            path_rank.push_back(w[i]);
+            if (dfs(j, b)) return true;
+            path_rank.pop_back();
         }
     }
     path.pop_back();
     return false;
 }
 
-
 int mad() {
-    int mx = 0;
-    if (!mad1.empty()) {
-        mx = max(mx, *mad1.rbegin());
-    }
-    if (!mad2.empty()) {
-        mx = max(mx, *mad2.rbegin());
-    }
-    return mx;
+    int res = 0;
+    if (!mad1.empty()) res = *mad1.rbegin();
+    if (!mad2.empty()) res = std::max(res, *mad2.rbegin());
+    return res;
 }
 
+void modify(int u, int b1, int b2) {
+    cnt1[v[u]]++;
+    if (cnt1[v[u]] == 2) mad1.insert(v[u]);
+    cnt2[v[u]]--;
+    if (cnt2[v[u]] < 2) mad2.erase(v[u]);
 
-void recalc(int v, int ban1, int ban2) {
-    cnt1[val[v]]++;
-    if (cnt1[val[v]] == 2) {
-        mad1.insert(val[v]);
-    }
-    cnt2[val[v]]--;
-    if (cnt2[val[v]] == 1) {
-        mad2.erase(val[v]);
-    }
-    for (auto [i, _] : g[v]) {
-        if (i != ban1 && i != ban2) {
-            recalc(i, v, -1);
-        }
+    for (int i = h[u]; ~i; i = ne[i]) {
+        int j = e[i];
+        if (j == b1 || j == b2) continue;
+        modify(j, u, -1);
     }
 }
 
-
-signed main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
+void solve() {
     int n;
-    cin >> n;
+    std::cin >> n;
+    memset(h, -1, sizeof h);
     for (int i = 0; i < n - 1; i++) {
         int a, b;
-        cin >> a >> b;
-        a--, b--;
-        g[a].emplace_back(b, i);
-        g[b].emplace_back(a, i);
+        std::cin >> a >> b;
+        add(--a, --b, i); add(b, a, i);
     }
-
-    map <int, vector <int>> ind;    // ind 记录值为x的点的集合都有哪些
+    std::map<int, std::vector<int>> count;
     for (int i = 0; i < n; i++) {
-        cin >> val[i];
-        ind[val[i]].push_back(i);
-        cnt2[val[i]]++;
-        if (cnt2[val[i]] == 2) {
-            mad2.insert(val[i]);    // md2存值为x个数>=2的点
+        std::cin >> v[i];
+        cnt2[v[i]]++;
+        count[v[i]].push_back(i);
+        if (cnt2[v[i]] == 2) {
+            mad2.insert(v[i]);
         }
     }
-
-    while (!ind.empty() && ind.rbegin() -> second.size() == 1) {
-        ind.erase(prev(ind.end()));
+    while (!count.empty() && count.rbegin() -> second.size() == 1) count.erase(prev(count.end()));
+    if (count.empty()) {
+        for (int i = 0; i < n - 1; i++)
+            std::cout << "0\n";
+        return;
     }
-    if (ind.empty()) {
+    if (count.rbegin() -> second.size() > 2) {
         for (int i = 0; i < n - 1; i++) {
-            cout << "0\n";
+            std::cout << count.rbegin() -> first << "\n";
         }
-        return 0;
-    } else if (ind.rbegin()->second.size() > 2) {
-        for (int i = 0; i < n - 1; i++) {
-            cout << ind.rbegin() -> first << "\n";
-        }
-        return 0;
+        return;
     }
-
-    int a = ind.rbegin()->second[0], b = ind.rbegin()->second[1];
+    int a = count.rbegin() -> second[0], b = count.rbegin() -> second[1];
     dfs(a, b);
-
-    ans.assign(n - 1, ind.rbegin() -> first);
-    recalc(path[0], path[1], -1);
-    ans[path_ind[0]] = mad();
-
+    std::vector<int> ans(n - 1, v[a]);
+    modify(path[0], path[1], -1);
+    ans[path_rank[0]] = mad();
     for (int i = 1; i + 1 < path.size(); i++) {
-        recalc(path[i], path[i - 1], path[i + 1]);
-        ans[path_ind[i]] = mad();
+        modify(path[i], path[i - 1], path[i + 1]);
+        ans[path_rank[i]] = mad();
     }
+    for (int i = 0; i < n - 1; i++)
+        std::cout << ans[i] << "\n";
+}
 
-    for (int i : ans) {
-        cout << i << "\n";
-    }
+
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    solve();
     return 0;
 }
