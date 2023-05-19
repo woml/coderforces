@@ -7,35 +7,23 @@ typedef pair<int, int> PII;
 
 const int N = 2e5 + 10;
 
-vector<int> e[N];
-map<pair<int,int>, int> idx;
+int sz[N];
+vector<pair<int,int>> e[N];
 vector<int> ans;
 bool f;
 
-int dfs(int u, int fa) {
-    int res = 1, cnt = 0, used = 0;
-    cout << "u = " << u << " fa = " << fa << "\n";
-    for (auto v : e[u]) {
+void dfs(int u, int fa) {
+    sz[u] = 1;
+    for (auto [v, idx] : e[u]) {
         if (v == fa) continue;
-        int t = dfs(v, u);
-        if (t == -2) ans.push_back(idx[{u, v}]);
-        else if (t == -1) {
-            if (used == 1) f = false;
-            used = 1;
-            cnt++;
-        } else {
-            cnt += t;
+        dfs(v, u);
+        if (sz[v] == 3) {
+            ans.push_back(idx);
+            sz[v] = 0;
         }
+        sz[u] += sz[v];
     }
-    if (cnt > 2) {
-        f = false;
-    } else if (cnt == 2) {
-        if (used == 1) f = false;
-        res = -2; // cut
-    } else if (cnt == 1) {
-        res = -1;
-    }
-    return res;
+    if (sz[u] > 3) f = false;
 }
 
 void solve() {
@@ -43,17 +31,14 @@ void solve() {
     cin >> n;
     f = true;
     for (int i = 1; i <= n; i++) e[i].clear();
-    idx.clear();
     ans.clear();
     for (int i = 1, u, v; i < n; i++) {
         cin >> u >> v;
-        idx[{u, v}] = i;
-        idx[{v, u}] = i;
-        e[u].push_back(v);
-        e[v].push_back(u);
+        e[u].push_back({v, i});
+        e[v].push_back({u, i});
     }
     dfs(1, -1);
-    if (!f) cout << "-1\n";
+    if (!f || sz[1] != 3) cout << "-1\n";
     else {
         int n = ans.size();
         cout << n << "\n";
