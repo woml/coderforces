@@ -10,21 +10,29 @@ const int N = 1e5 + 10;
 void solve() {
     map<int, int> cnt;
     int x, now = 1;
-    ll step = 0;
-    for (int i = 0; ; i++) {
-        cin >> x;
-        if (!cnt.count(x)) {
-            cnt.insert({x, i});
-        } else {
-            int t = cnt[x];
-            step = (ll)(t + 1 + i) * (i - t) / 2;
-            break;
-        }
-        cout << "+ " << now++ << endl;
+    cin >> x;
+    cnt.insert({x, 0});
+    for (int i = 1; i <= 1000; i++) {
+        cout << "+ " << 1 << endl;
         cout.flush();
+        cin >> x;
+        if (!cnt.count(x)) cnt.insert({x, i});
+        else {
+            cout << "! " << i << endl;
+            cout.flush();
+            return;
+        }
     }
-    cout << "! " << step << endl;
-    cout.flush();
+    for (int i = 1; ; i++) {
+        cout << "+ " << 1000 << endl;
+        cout.flush();
+        cin >> x;
+        if (cnt.count(x)) {
+            cout << "! " << i * 1000 + 1000 - cnt[x] << endl;
+            cout.flush();
+            return;
+        }
+    }
 }
 
 int main(void) {
