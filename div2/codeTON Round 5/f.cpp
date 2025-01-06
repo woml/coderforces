@@ -8,36 +8,15 @@ typedef pair<int, int> pii;
 const int N = 5050;
 
 vector<int> e[N];
-vector<int> dep;
-int sz[N], f[N], c[N];
 int n, m;
 
-void dfs_1(int u, int fa) {
-    sz[u] = 1;
-    for (auto v : e[u]) {
-        if (v == fa) continue;
-        dfs_1(v, u);
-        sz[u] += sz[v];
-        f[u] += f[v];
-    }
-    f[u] += sz[u] - 1;
-}
 
-void dfs_2(int u, int fa) {
+void dfs(int u, int fa, vector<int> &dep, vector<int> &cnt) {
+    cnt[dep[u]]++;
     for (auto v : e[u]) {
         if (v == fa) continue;
-        c[v] = c[u] + f[u] - f[v] - sz[v] + n - sz[v];
-        dfs_2(v, u);
-    }
-}
-
-void dfs_3(int u, int fa, int t) {
-    for (auto v : e[u]) {
-        if (v == fa) continue;
-        dfs_3(v, u, t + 1);
-    }
-    if (e[u].size() == 1) {
-        dep.push_back(t);
+        dep[v] = dep[u] + 1;
+        dfs(v, u, dep, cnt);
     }
 }
 
@@ -48,31 +27,20 @@ void solve() {
         e[u].push_back(v);
         e[v].push_back(u);
     }
-    dfs_1(1, -1);
-    dfs_2(1, -1);
-    int root = 1;
-    for (int i = 1; i <= n; i++) {
-        // cout << f[i] << " " << c[i] << "\n";
-        if (f[i] + c[i] < f[root] + c[root]) root = i;
-    }
-    dfs_3(root, -1, 0);
-    sort(dep.begin(), dep.end());
-    m = dep.size();
-    // cout << "m = " << m << "\n";
-    // for (int i = 0; i < m; i++) cout << dep[i] << " ";
-    for (int k = 0; k <= n; k++) {
-        int del = 0, now = 0, depth = 1;
-        for (int i = 1, j = now; i < k; i++) {
-            del += depth;
-            if (dep[j] == depth) now++;
-            j++;
-            if (j == m) {
-                j = now;
-                depth++;
-            }
+    vector<int> ans(n + 1);
+    for (int root = 1; root <= n; root++) {
+        vector<int> dep(n + 1), cnt(n);
+        dfs(root, -1, dep, cnt);
+        int del = 0, k = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < cnt[i]; j++) {
+                k++;
+                del += i;
+                ans[k] = max(ans[k], (n - 1) * k - 2 * del);
+            }   
         }
-        cout << k * (n - 1) - del * 2 << " ";
     }
+    for (int i = 0; i <= n; i++) cout << ans[i] << " \n"[i == n];
 }
 
 int main(void) {

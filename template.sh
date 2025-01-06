@@ -1,5 +1,5 @@
 #! /bin/zsh
-OUTPUT_PATH=div2/757\ div2/
+OUTPUT_PATH=div2/ECR\ 165/
 mkdir ${OUTPUT_PATH}
 
 echo 1 > ${OUTPUT_PATH}in

@@ -1,14 +1,9 @@
-#include <iostream>
-#include <cstring>
-#include <algorithm>
-#include <unordered_map>
-#include <vector>
-#include <queue>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-typedef long long LL;
-typedef pair<int, int> PII;
+typedef long long ll;
+typedef pair<int, int> pii;
 
 const int N = 1e5 + 10;
 
@@ -17,10 +12,10 @@ void solve() {
 }
 
 int main(void) {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
     int cases;
-    std::cin >> cases;
+    cin >> cases;
     while (cases -- ) {
         solve();
     }

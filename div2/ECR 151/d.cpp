@@ -29,6 +29,7 @@ void solve() {
     ll sum = s[n], ans = 0;
     for (int i = 1; i <= n; i++) {
         ll tmp = s[n], k = s[i], p = i;
+        if (s[i] < ans) continue;
         while (r[p] != 0) {
             tmp += k - s[r[p]];
             k = s[r[p]];
